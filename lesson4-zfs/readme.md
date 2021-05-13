@@ -1,6 +1,6 @@
 # **Введение**
 
-Домашнее задание для урока "Файловая система и LVM"
+Домашнее задание для урока "ZFS"
 
 # **Запуск**
 
@@ -39,7 +39,7 @@ pool/zle       24K   832M       24K  /pool/zle
 [root@server ~]# zfs set compression=lzjb pool/lzjb
 [root@server ~]# zfs set compression=zle pool/zle
 ```
-Уопируем и проверяем сжатие
+Копируем и проверяем сжатие
 ```
 [root@server ~]# cp War_and_Peace.txt /pool/gzip
 [root@server ~]# cp War_and_Peace.txt /pool/gzip-N
