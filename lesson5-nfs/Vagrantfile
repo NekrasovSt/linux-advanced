@@ -35,6 +35,7 @@ Vagrant.configure(2) do |config|
           firewall-cmd --permanent --zone=public --add-service=nfs
           firewall-cmd --permanent --zone=public --add-service=mountd
           firewall-cmd --permanent --zone=public --add-service=rpc-bind
+          firewall-cmd --permanent --add-port=2049/udp --zone=public
           firewall-cmd --reload
           SHELL
   end
@@ -47,9 +48,9 @@ Vagrant.configure(2) do |config|
           yum install nfs-utils -y
           # монтирование
           mkdir /mnt/upload
-          mount -t nfs 192.168.50.10:/var/upload/ /mnt/upload/
+          mount -t nfs -o udp,nfsvers=3 192.168.50.10:/var/upload/ /mnt/upload/
           # Настройка автомонтирования после обращения к директории
-          echo "192.168.50.10:/var/upload  /mnt/upload  nfs  noauto,x-systemd.automount,noexec,rw,hard,intr  0 0" >> /etc/fstab
+          echo "192.168.50.10:/var/upload  /mnt/upload  nfs  noauto,x-systemd.automount,noexec,rw,hard,intr,udp,nfsvers=3  0 0" >> /etc/fstab
           SHELL
   end
 
