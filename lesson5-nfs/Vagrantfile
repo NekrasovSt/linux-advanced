@@ -1,0 +1,56 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "centos/7"
+
+#  config.vm.provision "ansible" do |ansible|
+#    ansible.verbose = "vvv"
+#    ansible.playbook = "playbook.yml"
+#    ansible.become = "true"
+#  end
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 256
+    v.cpus = 1
+  end
+
+  config.vm.define "nfss" do |nfss|
+    nfss.vm.network "private_network", ip: "192.168.50.10", virtualbox__intnet: "net1"
+    nfss.vm.hostname = "nfss"
+    #nfss.vm.provision "shell", path: "nfss_script.sh"
+    nfss.vm.provision "shell", inline: <<-SHELL
+          yum install nfs-utils -y
+          # подготовка папки
+          mkdir -p /var/upload
+          chown -R nfsnobody:nfsnobody /var/upload
+          # настройка и запуск сервера
+          echo "/var/upload *(rw,root_squash)" >> /etc/exports
+          exportfs -r
+          systemctl enable rpcbind nfs-server
+          systemctl start rpcbind nfs-server
+          systemctl enable firewalld
+          # настройка фаервола
+          systemctl start firewalld
+          firewall-cmd --permanent --zone=public --add-service=nfs
+          firewall-cmd --permanent --zone=public --add-service=mountd
+          firewall-cmd --permanent --zone=public --add-service=rpc-bind
+          firewall-cmd --reload
+          SHELL
+  end
+
+  config.vm.define "nfsc" do |nfsc|
+    nfsc.vm.network "private_network", ip: "192.168.50.11", virtualbox__intnet: "net1"
+    nfsc.vm.hostname = "nfsc"
+    #nfsc.vm.provision "shell", path: "nfsc_script.sh"
+    nfsc.vm.provision "shell", inline: <<-SHELL
+          yum install nfs-utils -y
+          # монтирование
+          mkdir /mnt/upload
+          mount -t nfs 192.168.50.10:/var/upload/ /mnt/upload/
+          # Настройка автомонтирования после обращения к директории
+          echo "192.168.50.10:/var/upload  /mnt/upload  nfs  noauto,x-systemd.automount,noexec,rw,hard,intr  0 0" >> /etc/fstab
+          SHELL
+  end
+
+end
