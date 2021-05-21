@@ -63,7 +63,7 @@ Generating sqlite DBs
 Sqlite DBs 
 ```
 Изменим конфиг nginx
-``
+```
 location / {
     root /usr/share/nginx/html;
     index index.html index.htm;
