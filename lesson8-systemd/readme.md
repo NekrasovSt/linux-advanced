@@ -10,7 +10,7 @@ vagrant up
 
 # **Написать service, который будет раз в 30 секунд мониторить лог на предмет наличия ключевого слова**
 
-Основная часть в полняется в установочном файле setup.sh
+Основная часть выполняется в установочном файле setup.sh
 1. Создается конфиг файл /etc/sysconfig/otus.config
 2. Создается сервис /etc/systemd/system/otus-unit.service
 3. Создается таймер /etc/systemd/system/otus-unit.timer
@@ -32,7 +32,7 @@ May 27 05:52:47 kernel-update grep[22732]: May 27 05:51:55 localhost grep: May 2
 
 # **Из репозитория epel установить spawn-fcgi и переписать init-скрипт на unit-файл (имя service должно называться так же: spawn-fcgi)**
 
-Основная часть в полняется в установочном файле setup.sh
+Основная часть выполняется в установочном файле setup.sh
 1. Установка зависимостей
 2. Создание конфиг файла /etc/sysconfig/spawn-fcgi
 3. Создание юнита /etc/systemd/system/spawn-fcgi.service
@@ -51,7 +51,7 @@ May 27 05:52:47 kernel-update grep[22732]: May 27 05:51:55 localhost grep: May 2
 ```
 
 # **Дополнить unit-файл httpd (он же apache) возможностью запустить несколько инстансов сервера с разными конфигурационными файлами**
-Основная часть в полняется в установочном файле setup.sh
+Основная часть выполняется в установочном файле setup.sh
 1. Подготовка конфигов /etc/sysconfig/conf1 и /etc/sysconfig/conf2
 2. Подготовка конфигов /etc/httpd/conf/httpd1.conf и /etc/httpd/conf/httpd2.conf
 3. Запуск двух экземпляров httpd
