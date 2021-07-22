@@ -1,0 +1,27 @@
+---
+- name: Install log server
+  hosts: log
+  become: true
+  tasks:
+    - name: Install  systemd-journal-gateway
+      yum:
+        name: systemd-journal-gateway
+        state: latest
+    - name: Creates directory
+      file:
+        path: /var/log/journal/remote
+        state: directory
+        owner: systemd-journal-remote
+        group: systemd-journal-remote
+        mode: 0775
+    - name: Copy systemdjournal-remote.service
+      copy:
+        src: systemdjournal-remote.service
+        dest: /lib/systemd/system/systemd-journal-remote.service
+      notify: restart systemd-journal-remote
+  handlers:
+    - name: restart systemd-journal-remote
+      systemd:
+        name: systemd-journal-remote
+        state: restarted
+        enabled: yes

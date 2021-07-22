@@ -1,0 +1,50 @@
+---
+- name: Setup remote logs
+  hosts: web
+  become: true
+  vars:
+    log_server_ip: 192.168.50.12
+  tasks:
+    - name: NGINX | Install EPEL Repo package from standart repo
+      yum:
+        name: epel-release
+        state: present
+      tags:
+        - epel-package
+        - packages
+    - name: Install nginx
+      yum:
+        name: nginx
+        state: latest
+      notify:
+        - restart nginx
+      tags:
+        - nginx-package
+        - packages
+    - name: Install  systemd-journal-gateway
+      yum:
+        name: systemd-journal-gateway
+        state: latest
+    - name: Copy template journal-upload.conf
+      template:
+        src: journal-upload.conf.j2
+        dest: /etc/systemd/journal-upload.conf
+      notify:
+        - restart upload service
+      tags:
+        - journal-upload-configuration    
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+    - name: reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
+    - name: restart upload service
+      systemd:
+        name: systemd-journal-upload
+        state: restarted
+        enabled: yes

@@ -1,0 +1,47 @@
+vmname1 = "web"
+vmname2 = "log"
+vmname3 = "ansible"
+
+Vagrant.configure(2) do |config|
+  config.vm.define vmname1 do |subconfig|
+    subconfig.vm.box = "centos/7"
+    subconfig.vm.hostname = vmname1
+    subconfig.vm.network :private_network, ip: "192.168.50.11" 
+    subconfig.vm.provider "virtualbox" do |vb|
+      vb.memory = "512"
+      vb.cpus = "2" 
+    end
+    subconfig.vm.provision "shell", inline: <<-SHELL
+      mkdir -p ~root/.ssh; cp ~vagrant/.ssh/auth* ~root/.ssh
+      sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+      systemctl restart sshd
+    SHELL
+  end
+  config.vm.define vmname2 do |subconfig|
+    subconfig.vm.box = "centos/7"
+    subconfig.vm.hostname = vmname2
+    subconfig.vm.network :private_network, ip: "192.168.50.12" 
+    subconfig.vm.provider "virtualbox" do |vb|
+      vb.memory = "512"
+      vb.cpus = "2" 
+    end
+    subconfig.vm.provision "shell", inline: <<-SHELL
+      mkdir -p ~root/.ssh; cp ~vagrant/.ssh/auth* ~root/.ssh
+      sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+      systemctl restart sshd
+    SHELL
+  end
+  config.vm.define vmname3 do |subconfig|
+    subconfig.vm.synced_folder "./share", "/share", type: 'virtualbox', mount_options: ["dmode=775,fmode=664"] 
+    subconfig.vm.box = "mrg/ansible"
+    subconfig.vm.hostname = vmname3
+    subconfig.vm.network :private_network, ip: "192.168.50.13" 
+    subconfig.vm.provider "virtualbox" do |vb|
+      vb.memory = "512"
+      vb.cpus = "2" 
+    end
+    subconfig.vm.provision "shell", inline: <<-SHELL
+      sudo apt-get install sshpass -y
+    SHELL
+  end
+end
