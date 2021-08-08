@@ -1,0 +1,20 @@
+---
+- name: Disable ethO
+  hosts: all
+  become: true
+  tasks:
+    - name: Install tracetoute
+      yum:
+        name: traceroute
+        state: latest
+    - name: Copy ifcfg-eth0
+      copy:
+        src: files/ifcfg-eth0
+        dest: /etc/sysconfig/network-scripts/
+      notify: restart network
+  handlers:
+    - name: restart network
+      systemd:
+        name: network
+        state: restarted
+        enabled: yes

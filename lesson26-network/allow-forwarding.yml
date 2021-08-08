@@ -1,0 +1,10 @@
+﻿---
+- name: Allow package`s worwarding
+  hosts: routers
+  become: true
+  tasks:
+    - name: Append a gateway
+      sysctl:
+        name: net.ipv4.conf.all.forwarding
+        value: 1
+        sysctl_set: yes

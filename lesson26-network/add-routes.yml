@@ -1,0 +1,12 @@
+﻿---
+- name: Add routes
+  hosts: centralRouter
+  become: true
+  tasks:
+    - name: Add routes office 2 to 1
+      shell: ip route add 192.168.2.0/24 via 192.168.255.6
+      ignore_errors: yes
+    - name: Add routes office 1 to 2
+      shell: ip route add 192.168.1.0/24 via 192.168.255.10
+      ignore_errors: yes
+        

@@ -1,0 +1,12 @@
+﻿---
+- name: disable eth0
+  import_playbook: disable-eth0.yml
+    
+- name: allow forwarding
+  import_playbook: allow-forwarding.yml
+  
+- name: insert gateway
+  import_playbook: insert-gateway.yml
+  
+- name: add routes
+  import_playbook: add-routes.yml
