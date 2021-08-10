@@ -1,0 +1,101 @@
+﻿---
+- name: Prepare a server
+  hosts: all
+  become: true
+  tasks:
+    - name: Disable it
+      selinux:
+        state: disabled
+    - name: Install dependencies
+      yum:
+        name:
+          - dhcp-server
+          - tftp-server
+          - httpd
+          - syslinux-tftpboot.noarch
+        state: present
+    - name: Setup DHCP
+      copy:
+        src: files/dhcpd.conf
+        dest: /etc/dhcp/dhcpd.conf
+      notify: restart dhcpd
+    - name: Create a pxelinux directory if it does not exist
+      file:
+        path: '{{item}}'
+        state: directory
+      loop:
+        - /var/lib/tftpboot/pxelinux/
+        - /var/lib/tftpboot/pxelinux/pxelinux.cfg
+        - /var/lib/tftpboot/pxelinux/images/CentOS-8
+    - name: Copy files for TFTP
+      copy:
+        remote_src: yes
+        src: /tftpboot/{{item}}
+        dest: '/var/lib/tftpboot/pxelinux'
+      notify: restart tftp
+      loop:
+        - pxelinux.0
+        - libutil.c32
+        - menu.c32
+        - libmenu.c32
+        - ldlinux.c32
+        - vesamenu.c32
+    - name: Make a menu
+      copy:
+        src: files/default
+        dest: /var/lib/tftpboot/pxelinux/pxelinux.cfg/default
+    - name: Download img
+      get_url:
+        url: '{{item}}'
+        dest: /var/lib/tftpboot/pxelinux/images/CentOS-8/
+      loop:
+        - 'http://ftp.mgts.by/pub/CentOS/8.3.2011/BaseOS/x86_64/os/images/pxeboot/initrd.img'
+        - 'http://ftp.mgts.by/pub/CentOS/8.3.2011/BaseOS/x86_64/os/images/pxeboot/vmlinuz'
+    - name: Configure apach file
+      copy:
+        src: files/pxe.conf
+        dest: /etc/httpd/conf.d
+      notify: restart httpd
+    - name: Check iso file exists.
+      stat:
+        path: /home/vagrant/boot.iso
+      register: p  
+    - name: Download iso
+      get_url:
+        url: http://ftp.mgts.by/pub/CentOS/8.3.2011/BaseOS/x86_64/os/images/boot.iso
+        dest: /home/vagrant/boot.iso
+        force: no
+      when: p.stat.exists == False
+    - name: Create www directory
+      file:
+        path: /var/www/centos8
+        state: directory
+    - name: Mount iso
+      mount:
+        path: /mnt
+        src: /home/vagrant/boot.iso
+        fstype: iso9660
+        opts: loop,ro
+        state: mounted
+    - name: Copy into www    
+      copy:
+        remote_src: yes
+        src: /mnt/
+        dest: /var/www/centos8/
+        mode: '0755'
+  handlers:
+    - name: restart dhcpd
+      systemd:
+        name: dhcpd
+        state: restarted
+        enabled: yes
+    - name: restart tftp
+      systemd:
+        name: tftp
+        state: restarted
+        enabled: yes    
+    - name: restart httpd
+      systemd:
+        name: httpd
+        state: restarted
+        enabled: yes  
