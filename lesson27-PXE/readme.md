@@ -12,7 +12,7 @@ ansible-playbook install.yml
 ```
 Внимание playbook выполняет загрузку образов из интернета, придется подождать!
 
-Запускае клиент
+Запускаем клиент
 
 ```
 vagrant up pxeclient
