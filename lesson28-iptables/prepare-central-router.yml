@@ -1,0 +1,15 @@
+---
+- name: Prepare for knocking
+  hosts: centralRouter
+  become: true
+  tasks:
+    - name: Copy knock script
+      copy:
+        src: files/knock.sh
+        dest: /home/vagrant
+        mode: a+x
+      ignore_errors: yes
+    - name: Install nmap
+      yum:
+        name: nmap
+        state: present

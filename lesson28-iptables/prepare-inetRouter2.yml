@@ -1,0 +1,14 @@
+---
+- name: Prepare the inetRouter2 for web.
+  hosts: inetRouter2
+  become: true
+  tasks:
+    - name: Add route inetRouter2
+      shell: ip route add 192.168.0.0/24 via 192.168.255.3
+      ignore_errors: yes
+    - name: Copy iptables rules
+      copy:
+        src: files/inetRouter2.rules
+        dest: /home/vagrant
+    - name: Set up rules
+      shell: iptables-restore < /home/vagrant/inetRouter2.rules

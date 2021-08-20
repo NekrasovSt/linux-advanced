@@ -1,0 +1,17 @@
+﻿---
+- name: Insert gateway
+  hosts: inner-hosts
+  become: true
+  tasks:
+    - name: Append a gateway
+      blockinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth1
+        block: |
+          GATEWAY={{ gateway }}
+      notify: restart network
+  handlers:
+    - name: restart network
+      systemd:
+        name: network
+        state: restarted
+        enabled: yes

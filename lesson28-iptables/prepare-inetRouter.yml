@@ -1,0 +1,23 @@
+---
+- name: Prepare the inetRouter machine for knocking.
+  hosts: inetRouter
+  become: true
+  tasks:
+    - name: Add route centalRouter
+      shell: ip route add 192.168.0.0/24 via 192.168.255.3
+      ignore_errors: yes
+    - name: Add route centalServer
+      shell: ip route add 192.168.11.0/24 via 192.168.255.2  
+    - name: Copy iptables rules
+      copy:
+        src: files/inetRouter.rules
+        dest: /home/vagrant
+    - name: Set up rules
+      shell: iptables-restore < /home/vagrant/inetRouter.rules
+    - name: Configure nat
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        destination: '!192.168.0.0/16'
+        out_interface: eth0
+        jump: MASQUERADE 

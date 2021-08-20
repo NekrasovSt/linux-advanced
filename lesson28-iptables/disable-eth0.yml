@@ -1,0 +1,24 @@
+---
+- name: Disable ethO
+  hosts: inner-hosts
+  become: true
+  tasks:
+    - name: Install utils
+      yum:
+        name: '{{item}}'
+        state: latest
+      loop:
+        - nmap
+        - traceroute
+        - tcpdump
+    - name: Disable default route for eth0
+      blockinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth0
+        block: DEFROUTE=no
+      notify: restart network
+  handlers:
+    - name: restart network
+      systemd:
+        name: network
+        state: restarted
+        enabled: yes

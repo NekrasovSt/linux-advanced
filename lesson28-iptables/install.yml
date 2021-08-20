@@ -1,0 +1,21 @@
+---
+- name: disable eth0
+  import_playbook: disable-eth0.yml
+
+- name: allow forwarding
+  import_playbook: allow-forwarding.yml
+
+- name: insert gateway
+  import_playbook: insert-gateway.yml
+  
+- name: prepare inetRouter
+  import_playbook: prepare-inetRouter.yml
+  
+- name: install gateway
+  import_playbook: install-nginx.yml
+
+- name: prepare inetRouter2
+  import_playbook: prepare-inetRouter2.yml
+
+- name: prepare centralRouter
+  import_playbook: prepare-centralRouter.yml  
