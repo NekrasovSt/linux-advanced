@@ -11,7 +11,7 @@ ansible-playbook install.yml
 
 ## **Проверка knocking port**
 ```
-vagrant ssh centralServer
+vagrant ssh centralRouter
 ```
 Пробуем подключится ssh
 
