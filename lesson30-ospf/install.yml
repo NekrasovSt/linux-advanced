@@ -1,0 +1,77 @@
+---
+- name: Install utils
+  hosts: all
+  become: true
+  tasks:
+    - name: Install utils
+      yum:
+        name: '{{item}}'
+        state: present
+      loop:
+        - traceroute
+        - quagga
+        - tcpdump
+        - libselinux-python
+        - libsemanage-python
+    - name: Disable default route for eth0
+      blockinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth0
+        block: DEFROUTE=no
+      notify: restart network
+    - name: Activate forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        sysctl_set: yes
+      notify: restart network
+    - name: Configure soft routing
+      sysctl:
+        name: net.ipv4.conf.all.rp_filter
+        value: 2
+        sysctl_set: yes
+      notify: restart network
+    - name: Set zebra_write_config = 1
+      seboolean:
+        name: zebra_write_config
+        state: yes
+        persistent: yes
+    - name: Enable services
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - zebra
+        - ospfd
+    - name: Copy ospfd config file from template
+      template:
+        src: ./files/ospfd.conf.j2
+        dest: /etc/quagga/ospfd.conf
+        owner: quagga
+        group: quaggavt
+        mode: 0660
+      notify:
+        - restart ospfd
+    - name: Copy zebra config file from template
+      template:
+        src: ./files/zebra.conf.j2
+        dest: /etc/quagga/zebra.conf
+        owner: quagga
+        group: quaggavt
+        mode: 0660
+      notify:
+        - restart zebra
+  handlers:
+    - name: restart network
+      systemd:
+        name: network
+        state: restarted
+        enabled: yes
+    - name: restart ospfd
+      service:
+        name: ospfd
+        state: restarted
+    - name: restart zebra
+      service:
+        name: zebra
+        state: restarted      
