@@ -1,0 +1,37 @@
+---
+- name: Prepare common tasks
+  hosts: all
+  become: true
+  tasks:
+    - name: Install utils
+      yum:
+        name: '{{item}}'
+        state: present
+      loop:
+        - traceroute
+        - tcpdump
+        - epel-release
+        - openvpn
+        - iperf3
+    - name: Activate forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        sysctl_set: yes
+    - name: 'Copy config for loopback'
+      template:
+        src: ./templates/ifcfg-lo.2.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-lo.2
+      notify:
+        - restart network
+    - name: 'Copy the key'
+      copy:
+        src: files/static.key
+        dest: /etc/openvpn/ 
+
+  handlers:
+    - name: restart network
+      systemd:
+        name: network
+        state: restarted
+        enabled: yes

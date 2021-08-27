@@ -1,0 +1,7 @@
+---
+- name: common
+  import_playbook: common-part.yml
+- name: server
+  import_playbook: server-part.yml
+- name: client
+  import_playbook: client-part.yml  

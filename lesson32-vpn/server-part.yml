@@ -1,0 +1,24 @@
+---
+- name: Prepare server tasks
+  hosts: ovpn-server
+  become: true
+  tasks:
+    - name: Install utils
+      yum:
+        name: '{{item}}'
+        state: present
+      loop:
+        - easy-rsa
+        - policycoreutils-python
+    - name: Copy server.conf
+      template:
+        src: server.conf.j2
+        dest: /etc/openvpn/server.conf
+      notify:
+        - restart openvpn server
+  handlers:
+    - name: restart openvpn server
+      systemd:
+        name: openvpn@server
+        state: restarted
+        enabled: yes

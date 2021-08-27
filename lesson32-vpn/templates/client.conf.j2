@@ -1,0 +1,10 @@
+dev {{ stsdev }}
+remote {{ stsremote }}
+ifconfig {{ stsifconfig }}
+topology subnet
+route {{ stsroute }}
+secret /etc/openvpn/static.key
+compress lzo
+status /var/log/openvpn-status.log
+log /var/log/openvpn.log
+verb 3
