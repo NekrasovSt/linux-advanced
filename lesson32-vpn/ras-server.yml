@@ -1,0 +1,65 @@
+---
+- name: Prepare server tasks
+  hosts: ovpn-server
+  become: true
+  tasks:
+    - name: Selinux
+      seport:
+        ports: 1195
+        proto: udp
+        setype: openvpn_port_t
+        state: present
+    - name: Config loopback
+      template:
+        src: ./templates/ifcfg-lo.2.j2
+        dest: /etc/sysconfig/network-scripts/ifcfg-lo.2
+      notify:
+        - restart network
+    - name: Create directory for certs
+      file:
+        path: /etc/openvpn/pki/issued
+        state: directory
+        mode: '0700'
+
+    - name: Copy root cert ca.crt and DH key to ovpn-server
+      copy:
+        src: files/{{ item }}
+        dest: /etc/openvpn/pki/
+      loop:
+        - ca.crt
+        - dh.pem
+
+    - name: Copy server.crt
+      copy:
+        src: files/server.crt
+        dest: /etc/openvpn/pki/issued/
+
+    - name: Copy server.key
+      copy:
+        src: files/server.key
+        dest: /etc/openvpn/pki/private/
+
+    - name: Copy ta.key
+      copy:
+        src: files/ta.key
+        dest: /etc/openvpn/
+        
+    - name: Config server
+      template:
+        src: templates/ras-server.conf.j2
+        dest: /etc/openvpn/server.conf
+      notify:
+        - restart openvpn server
+        
+        
+  handlers:
+    - name: restart network
+      systemd:
+        name: network
+        state: restarted
+        enabled: yes
+    - name: restart openvpn server
+      systemd:
+        name: openvpn@server
+        state: restarted
+        enabled: yes      

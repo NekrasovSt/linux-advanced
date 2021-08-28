@@ -1,0 +1,19 @@
+port 1195
+proto udp
+dev tun
+ca /etc/openvpn/pki/ca.crt
+cert /etc/openvpn/pki/issued/server.crt
+key /etc/openvpn/pki/private/server.key
+dh /etc/openvpn/pki/dh.pem
+server 172.16.10.0 255.255.255.0
+route 10.0.0.2 255.255.255.255
+push "route 10.0.0.1 255.255.255.255"
+client-to-client
+client-config-dir /etc/openvpn/client
+keepalive 10 120
+compress lzo
+persist-key
+persist-tun
+status /var/log/openvpn-status.log
+log /var/log/openvpn.log
+verb 3

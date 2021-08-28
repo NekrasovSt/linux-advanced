@@ -1,0 +1,5 @@
+---
+- name: server
+  import_playbook: ras-server.yml
+- name: client
+  import_playbook: ras-client.yml
