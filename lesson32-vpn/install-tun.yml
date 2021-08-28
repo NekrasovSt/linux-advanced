@@ -3,9 +3,9 @@
   import_playbook: common-part.yml
 - name: server
   vars:
-    stsdev: 'tap'
+    stsdev: 'tun'
   import_playbook: server-part.yml
 - name: client
   vars:
-    stsdev: 'tap'
-  import_playbook: client-part.yml  
+    stsdev: 'tun'
+  import_playbook: client-part.yml

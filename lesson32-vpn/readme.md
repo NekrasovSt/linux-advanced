@@ -22,21 +22,45 @@ iperf3 -s
 ```
 [vagrant@client ~]$ iperf3 -c 172.16.10.1 -t 40 -i 5
 Connecting to host 172.16.10.1, port 5201
-[  4] local 172.16.10.2 port 41400 connected to 172.16.10.1 port 5201
+[  4] local 172.16.10.2 port 38538 connected to 172.16.10.1 port 5201
 [ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
-[  4]   0.00-5.00   sec   109 MBytes   183 Mbits/sec  427    319 KBytes
-[  4]   5.00-10.00  sec   107 MBytes   180 Mbits/sec  241    328 KBytes
-[  4]  10.00-15.00  sec   108 MBytes   181 Mbits/sec  362    245 KBytes
-[  4]  15.00-20.01  sec   109 MBytes   182 Mbits/sec  151    312 KBytes
-[  4]  20.01-25.00  sec   107 MBytes   180 Mbits/sec  395    237 KBytes
-[  4]  25.00-30.00  sec   107 MBytes   180 Mbits/sec  209    102 KBytes
-[  4]  30.00-35.01  sec   108 MBytes   181 Mbits/sec  225    241 KBytes
-[  4]  35.01-40.01  sec   108 MBytes   180 Mbits/sec  130    203 KBytes
+[  4]   0.00-5.00   sec  23.8 MBytes  39.9 Mbits/sec   25    157 KBytes
+[  4]   5.00-10.01  sec  23.2 MBytes  38.9 Mbits/sec    2    200 KBytes
+[  4]  10.01-15.00  sec  22.7 MBytes  38.1 Mbits/sec   13    178 KBytes
+[  4]  15.00-20.00  sec  22.7 MBytes  38.1 Mbits/sec   26    154 KBytes
+[  4]  20.00-25.00  sec  22.7 MBytes  38.1 Mbits/sec   30    141 KBytes
+[  4]  25.00-30.01  sec  22.8 MBytes  38.3 Mbits/sec    1    186 KBytes
+[  4]  30.01-35.01  sec  23.0 MBytes  38.6 Mbits/sec   11    212 KBytes
+[  4]  35.01-40.00  sec  22.9 MBytes  38.4 Mbits/sec   52    181 KBytes
 - - - - - - - - - - - - - - - - - - - - - - - - -
 [ ID] Interval           Transfer     Bandwidth       Retr
-[  4]   0.00-40.01  sec   863 MBytes   181 Mbits/sec  2140             sender
-[  4]   0.00-40.01  sec   862 MBytes   181 Mbits/sec                  receiver
+[  4]   0.00-40.00  sec   184 MBytes  38.6 Mbits/sec  160             sender
+[  4]   0.00-40.00  sec   183 MBytes  38.4 Mbits/sec                  receiver
 
 iperf Done.
 
 ```
+
+Меняем режим
+```
+ansible-playbook install-tap.yml
+[vagrant@client ~]$ iperf3 -c 172.16.10.1 -t 40 -i 5
+Connecting to host 172.16.10.1, port 5201
+[  4] local 172.16.10.2 port 38544 connected to 172.16.10.1 port 5201
+[ ID] Interval           Transfer     Bandwidth       Retr  Cwnd
+[  4]   0.00-5.00   sec  24.9 MBytes  41.7 Mbits/sec   45    205 KBytes
+[  4]   5.00-10.01  sec  23.0 MBytes  38.6 Mbits/sec   14    169 KBytes
+[  4]  10.01-15.00  sec  22.7 MBytes  38.1 Mbits/sec    5    144 KBytes
+[  4]  15.00-20.01  sec  23.0 MBytes  38.5 Mbits/sec    5    131 KBytes
+[  4]  20.01-25.00  sec  23.0 MBytes  38.6 Mbits/sec   13    181 KBytes
+[  4]  25.00-30.00  sec  23.6 MBytes  39.6 Mbits/sec   23    202 KBytes
+[  4]  30.00-35.00  sec  22.7 MBytes  38.1 Mbits/sec   10    177 KBytes
+[  4]  35.00-40.00  sec  22.8 MBytes  38.2 Mbits/sec   29    168 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bandwidth       Retr
+[  4]   0.00-40.00  sec   186 MBytes  38.9 Mbits/sec  144             sender
+[  4]   0.00-40.00  sec   185 MBytes  38.7 Mbits/sec                  receiver
+
+iperf Done.
+```
+Видим небольшой прирост скорости.
