@@ -7,7 +7,7 @@
 ```
 vagrant up
 ```
-## **Запуск виртуалки в режиме tun**
+## **Запуск виртуалки в режиме tap/tun**
 
 ```
 ansible-playbook install-tap.yml
@@ -43,7 +43,11 @@ iperf Done.
 
 Меняем режим
 ```
-ansible-playbook install-tap.yml
+ansible-playbook install-tun.yml
+```
+Проверяем
+```
+
 [vagrant@client ~]$ iperf3 -c 172.16.10.1 -t 40 -i 5
 Connecting to host 172.16.10.1, port 5201
 [  4] local 172.16.10.2 port 38544 connected to 172.16.10.1 port 5201
