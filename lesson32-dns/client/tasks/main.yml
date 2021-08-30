@@ -1,0 +1,16 @@
+---
+# tasks file for client
+- name: Install packages
+  yum:
+    name:
+      - bind-utils
+      - ntp
+    state: present
+
+- name: Config resolve
+  copy:
+    src: client-resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644

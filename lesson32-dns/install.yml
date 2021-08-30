@@ -1,0 +1,12 @@
+---
+- hosts: servers
+  become: true
+
+  roles:
+    - server
+
+- hosts: clients
+  become: true
+
+  roles:
+    - client
