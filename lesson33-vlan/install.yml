@@ -3,3 +3,8 @@
   become: true
   roles:
     - vlan
+  
+- hosts: bonding
+  become: true
+  roles:
+    - bonding     
