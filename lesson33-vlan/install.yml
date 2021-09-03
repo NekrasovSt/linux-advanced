@@ -7,4 +7,9 @@
 - hosts: bonding
   become: true
   roles:
-    - bonding     
+    - bonding 
+      
+- hosts: all
+  become: true
+  roles:
+    - ipconfig      
