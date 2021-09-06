@@ -1,0 +1,63 @@
+---
+- name: Allow password authentication via ssh
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication.*$'
+    line: 'PasswordAuthentication yes'
+  notify:
+    - restart sshd
+
+- name: Set hostname
+  hostname:
+    name: ipaserver.mytest.lab
+
+- name: Set hosts
+  replace:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1[ \t]+ipaserver[ \t]+ipaserver'
+    replace: '192.168.10.1    ipaserver.mytest.lab    ipaserver'
+  notify:
+    - restart network
+
+- name: Set timezone
+  timezone:
+    name: Asia/Yekaterinburg
+
+- name: Install packages
+  yum:
+    name:
+      - ipa-server
+      - ipa-server-dns
+    state: present
+
+- name: Install ipa server
+  command: |
+    ipa-server-install --unattended \
+    --realm=MYTEST.LAB \
+    --domain=mytest.lab \
+    --ds-password=P@ssw0rd \
+    --master-password=P@ssw0rd \
+    --admin-password=P@ssw0rd \
+    --hostname=ipaserver.mytest.lab \
+    --ip-address=192.168.10.1 \
+    --setup-dns \
+    --forwarder=8.8.8.8 \
+    --auto-reverse \
+    --mkhomedir
+  args:
+    creates: /etc/ipa/default.conf
+
+- name: Create ipa user
+  ipa_user:
+    name: stas
+    givenname: Stanislav
+    sn: Nekrasov
+    displayname: Stanislav Nekrasov
+    password: stas123456
+    krbpasswordexpiration: '20211231235959'
+    sshpubkey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4a52WJAhrbPzn2TiTNU84vA+egxxM/um5NpWbnos45Fh2KIKmvh79B10fQlPnD1zss/7+pHEEKjsjnU41Utax6R7oKeApo7ZI7GLrTmRSFyPlvkbBCf/SUPaj7A04tXF8boK06QHPDqD0Tgze/F7usuGEtq83sv2ScfKGwheau+6pjE8qGGifDK0pZNDiyzKHceZb30zAPkvE8u8u9hWCuUYgfqc7W5uqpPePwDYR0c2K5xtm8hrj5dSPbFowXxlFyIfz0LBs5/wuvlyfrcW+QyBTM1YKpzdcr6pgu43wywYaDHqb78c65+8Y41OQE3vckn3oKtQxMNf7tNcwF0kP stas@mytest.lab
+    loginshell: /bin/bash
+    ipa_pass: P@ssw0rd
+    ipa_host: ipaserver.mytest.lab
+    state: present
+    validate_certs: no
