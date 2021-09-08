@@ -1,0 +1,67 @@
+---
+- name: 'Allow password authentication via ssh'
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication.*$'
+    line: 'PasswordAuthentication yes'
+  notify:
+    - restart sshd
+
+- name: Set timezone
+  timezone:
+    name: Asia/Yekaterinburg
+
+- name: Set ipaclient hostname
+  hostname:
+    name: "{{ ansible_hostname }}.mytest.lab"
+
+- name: Install packages
+  yum:
+    name: ipa-client
+    state: present
+
+#- name: NetworkManager dns off
+#  blockinfile:
+#    path: /etc/NetworkManager/conf.d/ipa-dns.conf
+#    create: yes
+#    block: |
+#      [main]
+#      dns=none
+#  notify:
+#    - restart NetworkManager
+
+- name: Copy resolv.conf from template
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+  notify:
+  - restart NetworkManager
+
+#- name: restart NetworkManager
+#  systemd:
+#    name: NetworkManager
+#    state: restarted
+
+- name: Install ipa client
+  command: |
+    ipa-client-install --unattended \
+    --server=ipaserver.mytest.lab \
+    --domain=mytest.lab \
+    --realm=MYTEST.LAB \
+    --principal admin \
+    --password=P@ssw0rd \
+    --mkhomedir \
+    --hostname={{ ansible_hostname }}.mytest.lab
+  args:
+    creates: /etc/ipa/default.conf
+
+- name: Copy ssh key
+  copy:
+    src: "{{ item }}"
+    dest: /home/vagrant/{{ item }}
+    owner: vagrant
+    group: vagrant
+    mode: '0600'
+  loop:
+    - key
+    - key.pub
