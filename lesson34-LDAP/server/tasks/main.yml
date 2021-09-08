@@ -10,14 +10,26 @@
 - name: Set hostname
   hostname:
     name: ipaserver.mytest.lab
+    
+- name: The first stuff you should to do 
+  selinux:
+    policy: targeted
+    state: permissive
 
+#- name: Set hosts
+#  replace:
+#    path: /etc/hosts
+#    regexp: '^127\.0\.0\.1[ \t]+ipaserver[ \t]+ipaserver'
+#    replace: '192.168.10.1    ipaserver.mytest.lab    ipaserver'
+#  notify:
+#    - restart network
 - name: Set hosts
-  replace:
-    path: /etc/hosts
-    regexp: '^127\.0\.0\.1[ \t]+ipaserver[ \t]+ipaserver'
-    replace: '192.168.10.1    ipaserver.mytest.lab    ipaserver'
+  copy:
+    src: hosts
+    dest: /etc/hosts
   notify:
     - restart network
+
 
 - name: Set timezone
   timezone:

@@ -11,7 +11,7 @@
   timezone:
     name: Asia/Yekaterinburg
 
-- name: Set ipaclient hostname
+- name: Set hostname
   hostname:
     name: "{{ ansible_hostname }}.mytest.lab"
 
@@ -35,12 +35,7 @@
     src: resolv.conf.j2
     dest: /etc/resolv.conf
   notify:
-  - restart NetworkManager
-
-#- name: restart NetworkManager
-#  systemd:
-#    name: NetworkManager
-#    state: restarted
+    - restart network
 
 - name: Install ipa client
   command: |

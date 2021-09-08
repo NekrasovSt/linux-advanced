@@ -4,7 +4,7 @@
     name: sshd
     state: restarted
 
-- name: restart NetworkManager
+- name: restart network
   systemd:
-    name: NetworkManager
+    name: network
     state: restarted
