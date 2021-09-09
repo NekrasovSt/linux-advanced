@@ -16,13 +16,6 @@
     policy: targeted
     state: permissive
 
-#- name: Set hosts
-#  replace:
-#    path: /etc/hosts
-#    regexp: '^127\.0\.0\.1[ \t]+ipaserver[ \t]+ipaserver'
-#    replace: '192.168.10.1    ipaserver.mytest.lab    ipaserver'
-#  notify:
-#    - restart network
 - name: Set hosts
   copy:
     src: hosts
@@ -73,3 +66,8 @@
     ipa_host: ipaserver.mytest.lab
     state: present
     validate_certs: no
+
+- name: restart network
+  systemd:
+    name: network
+    state: restarted

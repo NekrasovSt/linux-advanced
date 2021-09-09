@@ -20,22 +20,27 @@
     name: ipa-client
     state: present
 
-#- name: NetworkManager dns off
-#  blockinfile:
-#    path: /etc/NetworkManager/conf.d/ipa-dns.conf
-#    create: yes
-#    block: |
-#      [main]
-#      dns=none
-#  notify:
-#    - restart NetworkManager
+- name: NetworkManager dns off
+  blockinfile:
+    path: /etc/NetworkManager/conf.d/ipa-dns.conf
+    create: yes
+    block: |
+      [main]
+      dns=none
+  notify:
+    - restart NetworkManager
 
 - name: Copy resolv.conf from template
   template:
     src: resolv.conf.j2
     dest: /etc/resolv.conf
   notify:
-    - restart network
+    - prevent resolv.conf update
+
+- name: restart NetworkManager
+  systemd:
+    name: NetworkManager
+    state: restarted
 
 - name: Install ipa client
   command: |

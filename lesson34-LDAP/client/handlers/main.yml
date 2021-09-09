@@ -8,3 +8,13 @@
   systemd:
     name: network
     state: restarted
+    
+- name: prevent resolv.conf update
+  file:
+    path: /etc/resolv.conf
+    attr: +i
+    
+- name: restart NetworkManager
+  systemd:
+    name: NetworkManager
+    state: restarted    

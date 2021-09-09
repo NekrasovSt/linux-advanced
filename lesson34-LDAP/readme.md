@@ -46,3 +46,24 @@ Valid starting       Expires              Service principal
 Number of entries returned 1
 ----------------------------
 ```
+
+Пробуем зайти на другие машины.
+
+Первый вход пароль stas123456
+```
+[root@ws1 vagrant]# ssh stas@ws2.mytest.lab
+Password:
+Password expired. Change your password now.
+Current Password:
+New password:
+Retype new password:
+Creating home directory for stas.
+[stas@ws2 ~]$ exit
+logout
+Connection to ws2.mytest.lab closed.
+[root@ws1 vagrant]# ssh stas@ipaserver.mytest.lab
+Password:
+Creating home directory for stas.
+```
+
+Получается войти из ws1 на ws2 и ipaserver, можно также попробовать с других хостов.
