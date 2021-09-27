@@ -1,0 +1,90 @@
+---
+- name: Install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+    - Percona-Server-server-57
+    - MySQL-python
+
+- name: Copy MySQL configs
+  template:
+    src: "{{ item.src }}"
+    dest: /etc/my.cnf.d/{{ item.dest }}
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: 01-base.cnf.j2, dest: 01-base.cnf }
+    - { src: 02-max-connections.cnf.j2, dest: 02-max-connections.cnf }
+    - { src: 03-performance.cnf.j2, dest: 03-performance.cnf }
+    - { src: 04-slow-query.cnf.j2, dest: 04-slow-query.cnf }
+    - { src: 05-binlog.cnf.j2, dest: 05-binlog.cnf }
+
+- name: start mysqld
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Get password
+  shell: grep 'root@localhost:' /var/log/mysqld.log | awk '{print $11}'
+  register: temporary_root_password
+  args:
+    creates: /root/.my.cnf
+
+- name: Update password
+  shell: >
+    mysql -uroot -p'{{ temporary_root_password.stdout }}' --connect-expired-password
+    -e "ALTER USER USER() IDENTIFIED BY 'P@ssw0rd';"
+  args:
+    creates: /root/.my.cnf
+
+- name: Copy root my.cnf file
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Push dump file from host to slave
+  copy:
+    src: /tmp/master.sql
+    dest: /tmp/master.sql
+
+- name: Edit replication config
+  replace:
+    path: /etc/my.cnf.d/05-binlog.cnf
+    regexp: '^#(replicate-ignore-table)'
+    replace: '\1'
+  notify:
+    - restart mysqld
+
+- name: Create database
+  mysql_db:
+    name: bet
+    state: present
+
+- name: reset master
+  shell: mysql -e "reset master;"
+
+- name: restore database
+  mysql_db:
+    name: bet
+    state: import
+    target: /tmp/master.sql
+
+- name: Change master to host "master"
+  mysql_replication:
+    mode: changemaster
+    master_host: '192.168.11.150'
+    master_port: 3306
+    master_user: 'repl'
+    master_password: 'P@ssw0rd'
+    master_auto_position: yes
+
+- name: Start slave
+  mysql_replication:
+    mode: startslave

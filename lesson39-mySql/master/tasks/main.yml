@@ -1,0 +1,84 @@
+---
+- name: Install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+    - Percona-Server-server-57
+    - MySQL-python
+
+- name: Copy configs
+  template:
+    src: "{{ item.src }}"
+    dest: /etc/my.cnf.d/{{ item.dest }}
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: 01-base.cnf.j2, dest: 01-base.cnf }
+    - { src: 02-max-connections.cnf.j2, dest: 02-max-connections.cnf }
+    - { src: 03-performance.cnf.j2, dest: 03-performance.cnf }
+    - { src: 04-slow-query.cnf.j2, dest: 04-slow-query.cnf }
+    - { src: 05-binlog.cnf.j2, dest: 05-binlog.cnf }
+
+- name: start mysqld
+  systemd:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Get password
+  shell: grep 'root@localhost:' /var/log/mysqld.log | awk '{print $11}'
+  register: temporary_root_password
+  args:
+    creates: /root/.my.cnf
+
+- name: Update password
+  shell: >
+    mysql -uroot -p'{{ temporary_root_password.stdout }}' --connect-expired-password
+    -e "ALTER USER USER() IDENTIFIED BY 'P@ssw0rd';"
+  args:
+    creates: /root/.my.cnf
+
+- name: Copy root my.cnf file
+  template:
+    src: my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Create database
+  mysql_db:
+    name: bet
+    state: present
+
+- name: restore database
+  mysql_db:
+    state: import
+    name: bet
+    target: /vagrant/bet.dmp
+
+- name: Create user for replication
+  mysql_user:
+    name: repl
+    password: 'P@ssw0rd'
+    priv: '*.*:REPLICATION SLAVE'
+    host: '%'
+    state: present
+
+- name: Create database dump
+  mysql_db:
+    state: dump
+    name: all
+    ignore_tables:
+      - bet.events_on_demand
+      - bet.v_same_event
+    target: /tmp/master.sql
+
+- name: Pull dump file from master to host
+  fetch:
+    src: /tmp/master.sql
+    dest: /tmp/master.sql
+    flat: yes
