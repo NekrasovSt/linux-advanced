@@ -1,0 +1,2 @@
+192.168.10.10:5432:*:barman:P@ssw0rd
+192.168.10.10:5432:*:barman_streaming_user:P@ssw0rd

@@ -35,7 +35,7 @@
 
 - name: copy base from master to slave
   become_user: postgres
-  command: "pg_basebackup -X stream -h 192.168.1.1 -D /var/lib/pgsql/11/data/ -P -U streaming_user"
+  command: "pg_basebackup -X stream -h 192.168.10.10 -D /var/lib/pgsql/11/data/ -P -U streaming_user"
   notify: restart postgresql
 
 - name: copy recovery config to slave
