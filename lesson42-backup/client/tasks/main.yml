@@ -1,0 +1,14 @@
+---
+- name: install epel repo
+  yum:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - epel-release
+    - borgbackup
+      
+- name: copy ssh keys
+  copy: src=files/ssh/{{ item }} dest=~/.ssh/ mode=0600 owner=root group=root
+  with_items:
+    - id_rsa
+    - id_rsa.pub  

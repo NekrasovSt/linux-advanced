@@ -1,0 +1,38 @@
+---
+- name: install epel repo
+  yum:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - epel-release
+    - borgbackup
+
+- name: create user
+  user:
+    name: borg
+    
+- name: create backup dir
+  file:
+    path: /var/backup
+    state: directory
+    owner: borg
+    group: borg
+    
+
+- name: Create filesystem /dev/sdb
+  filesystem:
+    fstype: xfs
+    dev: /dev/sdb
+
+- name: Mount
+  mount:
+    path: /var/backup
+    src: /dev/sdb
+    state: mounted
+    fstype: xfs
+    
+- name: copy ssh keys
+  copy: src=files/ssh/{{ item }} dest=/home/borg/.ssh/ mode=0600 owner=borg group=borg
+  with_items:
+    - authorized_keys    
+    
