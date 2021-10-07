@@ -37,12 +37,6 @@
       - postgresql11-server
     state: present
     
-- name: start postgresql
-  systemd:
-    name: postgresql-11.service
-    state: started
-    enabled: yes   
-
 - name: init db
   shell: /usr/pgsql-11/bin/postgresql-11-setup initdb
   args:
@@ -72,6 +66,12 @@
   with_fileglob: files/*
   notify: restart postgresql
 
+- name: start postgresql
+  systemd:
+    name: postgresql-11.service
+    state: started
+    enabled: yes
+    
 - name: create slot
   become_user: postgres
   shell: psql postgres -c "SELECT pg_create_physical_replication_slot('standby_slot')"
