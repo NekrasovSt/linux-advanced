@@ -35,4 +35,13 @@
   copy: src=files/ssh/{{ item }} dest=/home/borg/.ssh/ mode=0600 owner=borg group=borg
   with_items:
     - authorized_keys    
+
+#- name: create backup config dir
+#  file:
+#    path: /var/backup/repo/data
+#    state: directory
+#    owner: borg
+#    group: borg
     
+#- name: init a repo (copy config)
+#  copy: src=files/config dest=/var/backup/repo/config  

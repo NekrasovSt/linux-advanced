@@ -11,4 +11,13 @@
   copy: src=files/ssh/{{ item }} dest=~/.ssh/ mode=0600 owner=root group=root
   with_items:
     - id_rsa
-    - id_rsa.pub  
+    - id_rsa.pub
+    - config
+      
+- name: init repo
+  shell: 'export BORG_PASSPHRASE=P@ssw0rd && borg init --encryption=repokey-blake2 borg@192.168.10.10:/var/backup/repo && touch repoinit'
+  args:
+    creates: repoinit
+
+- name: create backup
+  shell: 'export BORG_PASSPHRASE=P@ssw0rd && borg create borg@192.168.10.10:/var/backup/repo::"{now:%Y-%m-%d_%H:%M:%S}" /etc'
