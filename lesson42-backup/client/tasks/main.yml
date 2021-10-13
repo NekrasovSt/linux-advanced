@@ -15,9 +15,29 @@
     - config
       
 - name: init repo
-  shell: 'export BORG_PASSPHRASE=P@ssw0rd && borg init --encryption=repokey-blake2 borg@192.168.10.10:/var/backup/repo && touch repoinit'
+  shell: 'export BORG_PASSPHRASE=P@ssw0rd && borg init --encryption=repokey-blake2 borg@192.168.10.10:/var/backup/repo && touch /tmp/repoinit'
   args:
-    creates: repoinit
+    creates: /tmp/repoinit
 
-- name: create backup
-  shell: 'export BORG_PASSPHRASE=P@ssw0rd && borg create borg@192.168.10.10:/var/backup/repo::"{now:%Y-%m-%d_%H:%M:%S}" /etc'
+#- name: create backup
+#  shell: 'export BORG_PASSPHRASE=P@ssw0rd && borg create borg@192.168.10.10:/var/backup/repo::"{now:%Y-%m-%d_%H:%M:%S}" /etc'
+
+- name: copy backup script
+  copy:
+    src: files/borg-backup.sh
+    dest: /root/
+    mode: +x
+    
+- name: copy services
+  copy: src=files/{{ item }} dest=/etc/systemd/system/
+  with_items:
+    - borg-backup.service
+    - borg-backup.timer
+
+- name: restart borg
+  systemd:
+    name: borg-backup.timer
+    state: started
+    enabled: yes
+    daemon_reload: yes
+    

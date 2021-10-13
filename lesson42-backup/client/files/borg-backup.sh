@@ -11,7 +11,7 @@ echo $$ > ${LOCKFILE}
 
 export BORG_RSH="ssh -i /root/.ssh/id_rsa"
 export BORG_REPO=ssh://borg@192.168.10.10/var/backup/repo
-export BORG_PASSPHRASE='P@ssword'
+export BORG_PASSPHRASE='P@ssw0rd'
 LOG="/var/log/borg_backup.log"
 [ -f "$LOG" ] || touch "$LOG"
 exec &> >(tee -i "$LOG")

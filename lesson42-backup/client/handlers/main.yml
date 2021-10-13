@@ -1,0 +1,7 @@
+---
+
+- name: restart borg
+  systemd:
+    name: borg-backup.timer
+    state: started
+    enabled: yes
