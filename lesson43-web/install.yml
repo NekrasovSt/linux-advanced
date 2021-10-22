@@ -11,7 +11,11 @@
     #        validate_certs: no
     #        state: present
 
-    - name: Add CentOS_o repository
+    - name: Disable
+      selinux:
+        state: disabled
+          
+    - name: Add docker repository
       shell: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
       args:
         creates: /etc/yum.repos.d/docker-ce.repo
@@ -24,10 +28,10 @@
         - epel-release
         - postgresql-server
         - nginx
-        - docker-ce
         - python3-devel
         - python3-pip
         - python3-virtualenv
+        - docker-ce
 
     - name: Install docker dep
       pip:
@@ -38,18 +42,16 @@
       args:
         creates: /var/lib/pgsql/data/postgresql.conf
 
-#    - name: Add user to pg_hba.conf
-#      lineinfile:
-#        path: /var/lib/pgsql/data/pg_hba.conf
-#        line: 'host    all            agency            127.0.0.1/32          trust'
-
     - name: Copy config postgres
       copy:
-        src: files/pg_hba.conf
+        src: files/{{ item }}
         dest: /var/lib/pgsql/data/
         mode: 0600
         owner: postgres
         group: postgres
+      with_items:
+        - pg_hba.conf
+        - postgresql.conf
 
     - name: start postgresql
       systemd:
@@ -83,7 +85,27 @@
         name: agency
         image: pitchcontrol/agency-demo:1.0
         state: started
-        recreate: yes
+        recreate: no
         ports:
           - "8080:80"
         volumes: '/etc/agency/:/app/settings'
+        
+    - name: copy config
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: '0644'
+      with_items:
+        - { src: 'files/nginx/nginx.conf', dest: '/etc/nginx/' }
+        - { src: 'files/nginx/agency.conf', dest: '/etc/nginx/conf.d/' }
+#          - { src: 'files/nginx/conf.d/react.conf', dest: '/etc/nginx/conf.d/' }
+#          - { src: 'files/nginx/conf.d/django.conf', dest: '/etc/nginx/conf.d/' }
+      notify:
+        - restart nginx
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
