@@ -1,0 +1,89 @@
+---
+- name: Install and configure
+  hosts: web
+  become: yes
+
+  tasks:
+    #    - name: install postgresql repo
+    #      yum:
+    ##        name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    #        name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    #        validate_certs: no
+    #        state: present
+
+    - name: Add CentOS_o repository
+      shell: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install packages
+      dnf:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - epel-release
+        - postgresql-server
+        - nginx
+        - docker-ce
+        - python3-devel
+        - python3-pip
+        - python3-virtualenv
+
+    - name: Install docker dep
+      pip:
+        name: docker
+
+    - name: init db
+      shell: /usr/bin/postgresql-setup initdb
+      args:
+        creates: /var/lib/pgsql/data/postgresql.conf
+
+#    - name: Add user to pg_hba.conf
+#      lineinfile:
+#        path: /var/lib/pgsql/data/pg_hba.conf
+#        line: 'host    all            agency            127.0.0.1/32          trust'
+
+    - name: Copy config postgres
+      copy:
+        src: files/pg_hba.conf
+        dest: /var/lib/pgsql/data/
+        mode: 0600
+        owner: postgres
+        group: postgres
+
+    - name: start postgresql
+      systemd:
+        name: postgresql.service
+        state: restarted
+        enabled: yes
+
+    - name: create agency user
+      become_user: postgres
+      shell: psql postgres -c "CREATE USER agency WITH SUPERUSER PASSWORD 'P@ssw0rd'"
+      ignore_errors: yes
+
+    - name: Config file for web
+      file:
+        path: "/etc/agency"
+        state: directory
+
+    - name: Copy config web
+      copy:
+        src: files/appsettings.json
+        dest: /etc/agency
+
+    - name: start docker
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Start docker container
+      docker_container:
+        name: agency
+        image: pitchcontrol/agency-demo:1.0
+        state: started
+        recreate: yes
+        ports:
+          - "8080:80"
+        volumes: '/etc/agency/:/app/settings'
