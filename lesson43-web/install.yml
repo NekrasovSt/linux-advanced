@@ -14,7 +14,7 @@
     - name: Disable
       selinux:
         state: disabled
-          
+
     - name: Add docker repository
       shell: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
       args:
@@ -89,7 +89,7 @@
         ports:
           - "8080:80"
         volumes: '/etc/agency/:/app/settings'
-        
+
     - name: copy config
       copy:
         src: "{{ item.src }}"
@@ -100,10 +100,33 @@
       with_items:
         - { src: 'files/nginx/nginx.conf', dest: '/etc/nginx/' }
         - { src: 'files/nginx/agency.conf', dest: '/etc/nginx/conf.d/' }
-#          - { src: 'files/nginx/conf.d/react.conf', dest: '/etc/nginx/conf.d/' }
-#          - { src: 'files/nginx/conf.d/django.conf', dest: '/etc/nginx/conf.d/' }
+        - { src: 'files/nginx/go.conf', dest: '/etc/nginx/conf.d/' }
+      #          - { src: 'files/nginx/conf.d/django.conf', dest: '/etc/nginx/conf.d/' }
       notify:
         - restart nginx
+
+    - name: create directory go
+      file:
+        path: "/var/go-web"
+        state: directory
+
+    - name: copy go web
+      copy:
+        src: files/go-web
+        dest: /var/go-web
+        
+    - name: copy go web service
+      copy:
+        src: files/go.service
+        dest: /etc/systemd/system/
+
+    - name: start go web
+      systemd:
+        name: go.service
+        state: started
+        enabled: yes
+
+
   handlers:
     - name: restart nginx
       systemd:
