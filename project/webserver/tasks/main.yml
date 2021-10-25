@@ -1,0 +1,47 @@
+---
+
+- name: Add docker repository
+  shell: dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+    creates: /etc/yum.repos.d/docker-ce.repo
+
+- name: Install packages
+  dnf:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - epel-release
+    - postgresql
+    #      - nginx
+    - docker-ce
+    - python3-pip
+
+- name: Install docker dep
+  pip:
+    name: docker
+
+- name: Config file for web
+  file:
+    path: "/etc/agency"
+    state: directory
+
+- name: Copy config web
+  copy:
+    src: appsettings.json
+    dest: /etc/agency
+
+- name: start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Start docker container
+  docker_container:
+    name: agency
+    image: pitchcontrol/agency-demo:1.0
+    state: started
+    recreate: no
+    ports:
+      - "8080:80"
+    volumes: '/etc/agency/:/app/settings'          
