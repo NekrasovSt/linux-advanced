@@ -15,7 +15,13 @@ MACHINES = {
       :net => [
                  { ip: '192.168.10.3', netmask: '255.255.255.0' }
               ]
-    }   
+    }
+     :logserver => {
+      :box_name => "centos/8",
+      :net => [
+                 { ip: '192.168.10.4', netmask: '255.255.255.0' }
+              ]
+    }    
 }
 
 Vagrant.configure("2") do |config|

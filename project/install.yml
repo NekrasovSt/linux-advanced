@@ -1,4 +1,9 @@
-- hosts: webservers
+#- hosts: webservers
+#  become: True
+#  roles:
+#    - webserver
+
+- hosts: all
   become: True
   roles:
-    - webserver
+    - logclient

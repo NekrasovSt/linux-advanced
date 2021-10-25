@@ -1,0 +1,17 @@
+---
+# tasks file for logclient
+- name: Install  systemd-journal-gateway
+  yum:
+    name: systemd-journal-gateway
+    state: latest
+
+- name: Copy template journal-upload.conf
+  template:
+    src: journal-upload.conf.j2
+    dest: /etc/systemd/journal-upload.conf
+
+- name: start upload service
+  systemd:
+    name: systemd-journal-upload
+    state: started
+    enabled: yes
