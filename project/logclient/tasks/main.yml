@@ -10,6 +10,9 @@
     src: journal-upload.conf.j2
     dest: /etc/systemd/journal-upload.conf
 
+- name: Selinux policy
+  shell: setsebool -P nis_enabled 1
+
 - name: start upload service
   systemd:
     name: systemd-journal-upload

@@ -1,0 +1,14 @@
+[Unit]
+Requires=systemd-journal-remote.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-journal-remote --listen-http=-3 --output=/var/log/journal/remote
+User=systemd-journal-remote
+Group=systemd-journal-remote
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+WatchdogSec=10min
+
+[Install]
+Also=systemd-journal-remote.socket
