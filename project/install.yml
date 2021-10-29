@@ -1,14 +1,20 @@
-#- hosts: webservers
+- hosts: webservers
+  become: True
+  roles:
+    - webserver
+
+- hosts: webproxy
+  become: True
+  roles:
+    - webproxy
+
+#- hosts: all
 #  become: True
 #  roles:
-#    - webserver
+#    - logclient
+#
+#- hosts: logserver
+#  become: True
+#  roles:
+#    - logserver
 
-- hosts: all
-  become: True
-  roles:
-    - logclient
-
-- hosts: logserver
-  become: True
-  roles:
-    - logserver

@@ -1,0 +1,20 @@
+- name: Install packages
+  dnf:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - epel-release
+    - haproxy
+
+- name: copy config
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: 'haproxy', dest: '/etc/default/' }
+    - { src: 'haproxy.cfg', dest: '/etc/haproxy/' }
+  notify:
+    - restart haproxy

@@ -12,7 +12,7 @@
   loop:
     - epel-release
     - postgresql
-    #      - nginx
+    - nginx
     - docker-ce
     - python3-pip
 
@@ -44,4 +44,28 @@
     recreate: no
     ports:
       - "8080:80"
-    volumes: '/etc/agency/:/app/settings'          
+    volumes: '/etc/agency/:/app/settings'
+    
+- name: Config file for web
+  file:
+    path: "/etc/agency"
+    state: directory
+
+- name: Copy config web
+  copy:
+    src: appsettings.json
+    dest: /etc/agency
+
+- name: copy config
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: 'nginx.conf', dest: '/etc/nginx/' }
+    - { src: 'agency.conf', dest: '/etc/nginx/conf.d/' }
+    
+  notify:
+    - restart nginx    
