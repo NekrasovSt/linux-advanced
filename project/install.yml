@@ -1,12 +1,12 @@
-- hosts: webservers
-  become: True
-  roles:
-    - webserver
-
-- hosts: webproxy
-  become: True
-  roles:
-    - webproxy
+#- hosts: webservers
+#  become: True
+#  roles:
+#    - webserver
+#
+#- hosts: webproxy
+#  become: True
+#  roles:
+#    - webproxy
 
 #- hosts: all
 #  become: True
@@ -18,3 +18,7 @@
 #  roles:
 #    - logserver
 
+- hosts: dbs
+  become: True
+  roles:
+    - postgresnode

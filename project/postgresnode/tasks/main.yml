@@ -1,0 +1,16 @@
+- name: Install packages
+  dnf:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - epel-release
+    - postgresql-server
+    - postgresql
+    - https://github.com/cybertec-postgresql/patroni-packaging/releases/download/1.6.5-1/patroni-1.6.5-1.rhel7.x86_64.rpm
+
+- name: Config patrony
+  template:
+    src: postgresql.yml.j2
+    dest: /opt/app/patroni/etc/postgresql.yml
+  notify: restart patroni
+   
