@@ -22,3 +22,8 @@
   become: True
   roles:
     - postgresnode
+
+- hosts: dbproxy
+  become: True
+  roles:
+    - dbproxy

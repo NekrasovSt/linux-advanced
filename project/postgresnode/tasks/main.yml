@@ -13,4 +13,9 @@
     src: postgresql.yml.j2
     dest: /opt/app/patroni/etc/postgresql.yml
   notify: restart patroni
-   
+
+- name: start patroni
+  systemd:
+    name: patroni
+    state: started
+    enabled: yes    

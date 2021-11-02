@@ -1,0 +1,30 @@
+- name: Install packages
+  dnf:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - http://mirror.centos.org/centos/7/extras/x86_64/Packages/etcd-3.3.11-2.el7.centos.x86_64.rpm
+    - epel-release
+    - haproxy
+    - postgresql
+      
+- name: Copy etcd.conf
+  copy:
+    src: etcd.conf
+    dest: /etc/etcd/
+  notify: restart etcd
+
+- name: Selinux policy
+  shell: setsebool -P haproxy_connect_any 1
+
+- name: copy config
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: 'haproxy.cfg', dest: '/etc/haproxy/' }
+  notify:
+    - restart haproxy    

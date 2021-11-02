@@ -1,13 +1,13 @@
 scope: postgres
 namespace: /pg_cluster/
-name: pg_node1
+name: {{ inventory_hostname }}
 
 restapi:
   listen: {{ ansible_host }}:8008
   connect_address: {{ ansible_host }}:8008
 
 etcd:
-  host: 192.168.10.3:2379
+  host: 192.168.10.8:2379
 
 bootstrap:
   dcs:
@@ -41,7 +41,7 @@ postgresql:
   listen: {{ ansible_host }}:5432
   connect_address: {{ ansible_host }}:5432
   data_dir: /var/lib/pgsql/data
-  bin_dir: /usr/pgsql/bin
+  bin_dir: /usr/bin
   pgpass: /tmp/pgpass
   authentication:
     replication:
