@@ -9,9 +9,9 @@
     - postgresql
       
 - name: Copy etcd.conf
-  copy:
-    src: etcd.conf
-    dest: /etc/etcd/
+  template:
+    src: etcd.conf.j2
+    dest: /etc/etcd/etcd.conf
   notify: restart etcd
 
 - name: Selinux policy

@@ -56,6 +56,13 @@
     src: appsettings.json
     dest: /etc/agency
 
+- name: Selinux policy
+#  shell: setsebool -P httpd_can_network_relay 1
+  seboolean:
+    name: httpd_can_network_relay
+    state: yes
+    persistent: yes
+
 - name: copy config
   copy:
     src: "{{ item.src }}"
@@ -65,7 +72,6 @@
     mode: '0644'
   loop:
     - { src: 'nginx.conf', dest: '/etc/nginx/' }
-    - { src: 'agency.conf', dest: '/etc/nginx/conf.d/' }
-    
+    - { src: 'agency.conf', dest: '/etc/nginx/conf.d/' }   
   notify:
     - restart nginx    
