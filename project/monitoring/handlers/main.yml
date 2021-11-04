@@ -11,4 +11,10 @@
   systemd:
     name: grafana-server
     enabled: yes
-    state: started    
+    state: started
+
+- name: prometheus reload
+  systemd:
+    name: prometheus
+    state: restarted
+    enabled: yes      
