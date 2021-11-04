@@ -1,0 +1,14 @@
+---
+# handlers file for monitoring
+
+- name: systemd reload
+  systemd:
+    name: node_exporter
+    state: restarted
+    enabled: yes
+    
+- name: grafana systemd
+  systemd:
+    name: grafana-server
+    enabled: yes
+    state: started    

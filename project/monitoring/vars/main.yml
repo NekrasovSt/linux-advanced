@@ -1,0 +1,4 @@
+---
+# vars file for monitoring
+
+prometheus_version : 2.25.0

@@ -1,0 +1,81 @@
+---
+
+- name: Create User prometheus
+  user:
+    name: prometheus
+    create_home: no
+    shell: /bin/false
+
+- name: Create directories for prometheus
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+  loop:
+    - '/tmp/prometheus'
+    - '/etc/prometheus'
+    - '/var/lib/prometheus'
+
+- name: Download And Unzipped Prometheus
+  unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz
+    dest: /tmp/prometheus
+    creates: /tmp/prometheus/prometheus-{{ prometheus_version }}.linux-amd64
+    remote_src: yes
+
+- name: Copy Bin Files From Unzipped to Prometheus
+  copy:
+    src: /tmp/prometheus/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}
+    dest: /usr/local/bin/
+    remote_src: yes
+    mode: preserve
+    owner: prometheus
+    group: prometheus
+  loop: [ 'prometheus', 'promtool' ]
+
+- name: Copy Conf Files From Unzipped to Prometheus
+  copy:
+    src: /tmp/prometheus/prometheus-{{ prometheus_version }}.linux-amd64/{{ item }}
+    dest: /etc/prometheus/
+    remote_src: yes
+    mode: preserve
+    owner: prometheus
+    group: prometheus
+  loop: [ 'console_libraries', 'consoles' ]
+
+- name: Copy Conf Files From Unzipped to Prometheus
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/
+    mode: preserve
+    owner: prometheus
+    group: prometheus
+
+- name: Create File for Prometheus Systemd
+  copy:
+    src: prometheus.service
+    dest: /etc/systemd/system/
+
+- name: Systemctl Prometheus Start
+  systemd:
+    name: prometheus
+    state: started
+    enabled: yes
+
+- name: Add Graphana Repository
+  yum_repository:
+    name: Grafana
+    description: Grafana YUM repo
+    baseurl: https://packages.grafana.com/oss/rpm
+    gpgkey: https://packages.grafana.com/gpg.key
+    gpgcheck: yes
+    sslverify: yes
+    sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+
+- name: Install Grafana on RedHat Family
+  dnf:
+    name: grafana
+    state: present
+  notify:
+    - grafana systemd    
