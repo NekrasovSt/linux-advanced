@@ -4,46 +4,53 @@
 # vim: set ft=ruby :
 
 MACHINES = {
+    :firewall => {
+      :box_name => "centos/8",
+      :net => [
+                 { ip: '192.168.9.1', netmask: '255.255.255.0'},
+                 { ip: '192.168.10.1', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
+              ]
+    },
     :webserver1 => {
       :box_name => "centos/8",
       :net => [
-                 { ip: '192.168.10.2', netmask: '255.255.255.0' }
+                 { ip: '192.168.10.2', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :webserver2 => {
       :box_name => "centos/8",
       :net => [
-                 { ip: '192.168.10.3', netmask: '255.255.255.0' }
+                 { ip: '192.168.10.3', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :logserver => {
       :box_name => "centos/8",
       :net => [
-                 { ip: '192.168.10.4', netmask: '255.255.255.0' }
+                 { ip: '192.168.10.4', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :webproxy => {
       :box_name => "centos/8",
       :net => [
-                 { ip: '192.168.10.5', netmask: '255.255.255.0' }
+                 { ip: '192.168.10.5', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :db1 => {
           :box_name => "centos/8",
           :net => [
-                     { ip: '192.168.10.6', netmask: '255.255.255.0' }
+                     { ip: '192.168.10.6', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
                   ]
         },
     :db2 => {
       :box_name => "centos/8",
       :net => [
-                 { ip: '192.168.10.7', netmask: '255.255.255.0' }
+                 { ip: '192.168.10.7', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :dbproxy => {
       :box_name => "centos/8",
       :net => [
-                 { ip: '192.168.10.8', netmask: '255.255.255.0' }
+                 { ip: '192.168.10.8', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     }     
 }

@@ -1,0 +1,33 @@
+- name: SET ip_forward
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: start firewalld
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+    
+#ansible-galaxy collection install ansible.posix
+- name: Add zone public
+  ansible.posix.firewalld:
+    zone: public
+    interface: eth1
+    permanent: yes
+    state: enabled
+
+- name: Add zone dmz
+  lineinfile:
+    path:      /etc/sysconfig/network-scripts/ifcfg-eth2
+    line:      "ZONE=dmz"
+  notify:      restart network
+
+- name: Add zone public
+  lineinfile:
+    path:      /etc/sysconfig/network-scripts/ifcfg-eth1
+    line:      "ZONE=public"
+  notify:      restart network      

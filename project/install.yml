@@ -28,12 +28,17 @@
 #  roles:
 #    - dbproxy
 
-- hosts: all
-  become: True
-  roles:
-    - node_exporter
+#- hosts: all
+#  become: True
+#  roles:
+#    - node_exporter
+#
+#- hosts: webproxy
+#  become: True
+#  roles:
+#    - monitoring
 
-- hosts: webproxy
+- hosts: firewall
   become: True
   roles:
-    - monitoring
+    - firewall
