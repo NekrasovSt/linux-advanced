@@ -1,6 +1,6 @@
 - name: SET ip_forward
   sysctl:
-    name: net.ipv4.ip_forward
+    name: net.ipv4.conf.all.forwarding
     value: 1
     sysctl_set: yes
     state: present
@@ -11,23 +11,34 @@
     name: firewalld
     state: started
     enabled: yes
-    
+
 #ansible-galaxy collection install ansible.posix
-- name: Add zone public
-  ansible.posix.firewalld:
-    zone: public
-    interface: eth1
-    permanent: yes
-    state: enabled
 
 - name: Add zone dmz
   lineinfile:
-    path:      /etc/sysconfig/network-scripts/ifcfg-eth2
-    line:      "ZONE=dmz"
-  notify:      restart network
+    path: /etc/sysconfig/network-scripts/ifcfg-eth2
+    line: "ZONE=public"
+  notify: restart network
 
 - name: Add zone public
   lineinfile:
-    path:      /etc/sysconfig/network-scripts/ifcfg-eth1
-    line:      "ZONE=public"
-  notify:      restart network      
+    path: /etc/sysconfig/network-scripts/ifcfg-eth1
+    line: "ZONE=public"
+  notify: restart network
+
+#- name: forward port web
+#  ansible.posix.firewalld:
+#    port_forward:
+#      - port: 80,
+#        proto: tcp
+#        toaddr: 192.168.10.5
+#        toport: 80
+#    state: enabled 
+- name: forward ports
+  shell: firewall-cmd --permanent --zone=public --add-masquerade
+
+- name: forward ports
+  shell: firewall-cmd --permanent --add-forward-port=port=80:proto=tcp:toport=80:toaddr=192.168.10.5
+
+- name: restart
+  shell: firewall-cmd --reload 

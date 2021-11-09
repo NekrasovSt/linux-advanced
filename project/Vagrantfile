@@ -6,6 +6,7 @@
 MACHINES = {
     :firewall => {
       :box_name => "centos/8",
+      :ssh_port => '3001',
       :net => [
                  { ip: '192.168.9.1', netmask: '255.255.255.0'},
                  { ip: '192.168.10.1', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
@@ -13,42 +14,49 @@ MACHINES = {
     },
     :webserver1 => {
       :box_name => "centos/8",
+      :ssh_port => '3002',
       :net => [
                  { ip: '192.168.10.2', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :webserver2 => {
       :box_name => "centos/8",
+      :ssh_port => '3003',
       :net => [
                  { ip: '192.168.10.3', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :logserver => {
       :box_name => "centos/8",
+      :ssh_port => '3004',
       :net => [
                  { ip: '192.168.10.4', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :webproxy => {
       :box_name => "centos/8",
+      :ssh_port => '3005',
       :net => [
                  { ip: '192.168.10.5', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :db1 => {
-          :box_name => "centos/8",
-          :net => [
-                     { ip: '192.168.10.6', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
-                  ]
-        },
+      :box_name => "centos/8",
+      :ssh_port => '3006',
+      :net => [
+                 { ip: '192.168.10.6', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
+              ]
+    },
     :db2 => {
       :box_name => "centos/8",
+      :ssh_port => '3007',
       :net => [
                  { ip: '192.168.10.7', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
     },
     :dbproxy => {
       :box_name => "centos/8",
+      :ssh_port => '3008',
       :net => [
                  { ip: '192.168.10.8', netmask: '255.255.255.0', virtualbox__intnet: 'dmz' }
               ]
@@ -63,6 +71,7 @@ Vagrant.configure("2") do |config|
 
         box.vm.box = boxconfig[:box_name]
         box.vm.host_name = boxname.to_s
+        box.vm.network "forwarded_port", id: "ssh", guest: 22, host: boxconfig[:ssh_port]
 
         boxconfig[:net].each do |ipconf|
           box.vm.network "private_network", ipconf
