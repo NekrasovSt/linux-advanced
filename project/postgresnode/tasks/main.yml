@@ -14,7 +14,7 @@
     src: etcd.conf.j2
     dest: /etc/etcd/etcd.conf
   notify: restart etcd
-  
+
 - name: Config patrony
   template:
     src: postgresql.yml.j2
@@ -25,4 +25,10 @@
   systemd:
     name: patroni
     state: started
-    enabled: yes    
+    enabled: yes
+
+- name: start etcd
+  systemd:
+    name: etcd
+    state: started
+    enabled: yes      

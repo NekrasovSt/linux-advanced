@@ -1,12 +1,23 @@
-#- hosts: webservers
-#  become: True
-#  roles:
-#    - webserver
-#
-#- hosts: webproxy
-#  become: True
-#  roles:
-#    - webproxy
+- hosts: dbproxy
+  become: True
+  roles:
+    - dbproxy
+
+- hosts: dbs
+  become: True
+  roles:
+    - postgresnode
+
+
+- hosts: webservers
+  become: True
+  roles:
+    - webserver
+
+- hosts: webproxy
+  become: True
+  roles:
+    - webproxy
 
 #- hosts: all
 #  become: True
@@ -17,16 +28,6 @@
 #  become: True
 #  roles:
 #    - logserver
-
-#- hosts: dbs
-#  become: True
-#  roles:
-#    - postgresnode
-#
-#- hosts: dbproxy
-#  become: True
-#  roles:
-#    - dbproxy
 
 #- hosts: all
 #  become: True
@@ -42,3 +43,8 @@
   become: True
   roles:
     - firewall
+
+- hosts: dmz
+  become: true
+  roles:
+    - configroute

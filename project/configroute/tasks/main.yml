@@ -1,0 +1,21 @@
+- name: Install packages
+  dnf:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - network-scripts
+
+- name: Disable default route for eth0
+  blockinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    block: | 
+      DEFROUTE=no
+      NM_CONTROLLED=yes
+  notify: restart network
+
+- name: Append a gateway
+  blockinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth1
+    block: |
+      GATEWAY={{ gateway }}
+  notify: restart network  

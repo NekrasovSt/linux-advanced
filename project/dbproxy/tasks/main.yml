@@ -8,14 +8,15 @@
     - haproxy
     - postgresql
       
+- name: Selinux policy
+  shell: setsebool -P haproxy_connect_any 1
+  
 - name: Copy etcd.conf
   template:
     src: etcd.conf.j2
     dest: /etc/etcd/etcd.conf
   notify: restart etcd
 
-- name: Selinux policy
-  shell: setsebool -P haproxy_connect_any 1
 
 - name: copy config
   copy:
@@ -27,4 +28,10 @@
   loop:
     - { src: 'haproxy.cfg', dest: '/etc/haproxy/' }
   notify:
-    - restart haproxy    
+    - restart haproxy
+    - 
+- name: start haproxy
+  systemd:
+    name: haproxy
+    state: started
+    enabled: yes        
