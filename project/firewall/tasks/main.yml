@@ -21,8 +21,10 @@
     enabled: yes
 
 #ansible-galaxy collection install ansible.posix
-
-- name: forward ports
+- name: config dmz
+  shell: firewall-cmd --permanent --zone=dmz --change-interface=eth1
+  
+- name: masquerade
   shell: firewall-cmd --permanent --zone=public --add-masquerade
 
 - name: forward ports http
