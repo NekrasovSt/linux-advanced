@@ -18,4 +18,4 @@
     path: /etc/sysconfig/network-scripts/ifcfg-eth1
     block: |
       GATEWAY={{ gateway }}
-  notify: restart network  
+  notify: restart network

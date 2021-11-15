@@ -1,5 +1,3 @@
 ---
 - name: restart network
-  systemd:
-    name: NetworkManager.service
-    state: restarted
+  shell: nmcli networking off; nmcli networking on

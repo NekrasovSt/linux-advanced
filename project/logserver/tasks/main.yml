@@ -10,6 +10,9 @@
     owner: systemd-journal-remote
     group: systemd-journal-remote
     mode: 0775
+
+- name: config SELinux
+  shell: setsebool -P use_virtualbox 1
     
 - name: Copy systemdjournal-remote.service
   copy:

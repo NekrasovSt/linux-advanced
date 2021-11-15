@@ -1,3 +1,8 @@
+- hosts: dmz
+  become: true
+  roles:
+    - configroute
+
 - hosts: dbproxy
   become: True
   roles:
@@ -19,15 +24,17 @@
   roles:
     - webproxy
 
-#- hosts: all
-#  become: True
-#  roles:
-#    - logclient
-#
-#- hosts: logserver
-#  become: True
-#  roles:
-#    - logserver
+- hosts: logserver
+  become: True
+  roles:
+    - logserver
+
+- hosts: all, !logserver
+  become: True
+  roles:
+    - logclient
+
+
 
 #- hosts: all
 #  become: True
@@ -43,8 +50,3 @@
   become: True
   roles:
     - firewall
-
-- hosts: dmz
-  become: true
-  roles:
-    - configroute
