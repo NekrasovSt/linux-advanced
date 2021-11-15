@@ -1,9 +1,13 @@
 ---
 # tasks file for logclient
 - name: Install  systemd-journal-gateway
-  yum:
-    name: systemd-journal-gateway
+  dnf:
+    name: '{{ item }}'
     state: latest
+  loop:
+    - systemd-journal-gateway
+    - libselinux-python3
+    - libsemanage-python3
 
 - name: Copy template journal-upload.conf
   template:
@@ -11,8 +15,12 @@
     dest: /etc/systemd/journal-upload.conf
 
 - name: Selinux policy
-  shell: setsebool -P nis_enabled 1
-
+#  shell: setsebool -P nis_enabled 1
+  seboolean:
+    name: nis_enabled
+    state: yes
+    persistent: yes
+    
 - name: start upload service
   systemd:
     name: systemd-journal-upload

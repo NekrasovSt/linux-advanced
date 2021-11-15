@@ -7,10 +7,16 @@
     - epel-release
     - haproxy
     - postgresql
+    - libselinux-python3
+    - libsemanage-python3
       
 - name: Selinux policy
-  shell: setsebool -P haproxy_connect_any 1
-  
+#  shell: setsebool -P haproxy_connect_any 1
+  seboolean:
+    name: haproxy_connect_any
+    state: yes
+    persistent: yes
+    
 - name: Copy etcd.conf
   template:
     src: etcd.conf.j2
