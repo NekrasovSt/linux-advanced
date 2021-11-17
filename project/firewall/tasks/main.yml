@@ -35,6 +35,15 @@
 
 - name: forward ports haproxy db
   shell: firewall-cmd --permanent --add-forward-port=port=7000:proto=tcp:toport=7000:toaddr=192.168.10.8
+
+- name: forward ports prometheus
+  shell: firewall-cmd --permanent --add-forward-port=port=9090:proto=tcp:toport=9090:toaddr=192.168.10.5
+
+- name: forward ports prometheus
+  shell: firewall-cmd --permanent --add-forward-port=port=9090:proto=tcp:toport=9090:toaddr=192.168.10.5
+
+- name: forward ports grafana
+  shell: firewall-cmd --permanent --add-forward-port=port=3000:proto=tcp:toport=3000:toaddr=192.168.10.5
   
 - name: restart
   shell: firewall-cmd --reload 

@@ -1,3 +1,8 @@
+- hosts: firewall
+  become: True
+  roles:
+    - firewall
+
 - hosts: dmz
   become: true
   roles:
@@ -34,19 +39,12 @@
   roles:
     - logclient
 
-
-
-#- hosts: all
-#  become: True
-#  roles:
-#    - node_exporter
-#
-#- hosts: webproxy
-#  become: True
-#  roles:
-#    - monitoring
-
-- hosts: firewall
+- hosts: all
   become: True
   roles:
-    - firewall
+    - node_exporter
+
+- hosts: webproxy
+  become: True
+  roles:
+    - monitoring

@@ -86,3 +86,18 @@ Nov 15 15:25:50 webproxy dnf[11034]: Metadata cache refreshed recently.
 Nov 15 15:25:50 webproxy systemd[1]: dnf-makecache.service: Succeeded.
 Nov 15 15:25:50 webproxy systemd[1]: Started dnf makecache.
 ```
+## **Мониторинг**
+
+Мониторинг осуществляется при помощи Prometheus, node_exporter, Grafana
+На вссех машинах установлен node_exporter.
+На webproxy Prometheus + Grafana
+Prometheus: http://192.168.9.2:9090/
+Grafana: http://192.168.9.2:3000/ Доступ admin/admin
+![](screenshots/grafana.png)
+## **Алертинг**
+
+Для примера настроен алерт недоступна машина более 1 мин.
+
+Для примера можно выключить любую и посмотреть.
+http://192.168.9.2:9090/alerts
+![](screenshots/alert.png)
