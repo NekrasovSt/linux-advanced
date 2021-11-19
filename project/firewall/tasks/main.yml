@@ -20,30 +20,50 @@
     state: started
     enabled: yes
 
+- name: Create directories for firewalld conf
+  file:
+    path: /tmp/firewalld
+    state: directory
+
 #ansible-galaxy collection install ansible.posix
 - name: config dmz
-  shell: firewall-cmd --permanent --zone=dmz --change-interface=eth1
-  
+  shell: firewall-cmd --permanent --zone=dmz --change-interface=eth1 && touch /tmp/firewalld/dmz
+  args:
+    creates: /tmp/firewalld/dmz
+  notify: restart firewalld
+
 - name: masquerade
-  shell: firewall-cmd --permanent --zone=public --add-masquerade
+  shell: firewall-cmd --permanent --zone=public --add-masquerade && touch /tmp/firewalld/masquerade
+  args:
+    creates: /tmp/firewalld/masquerade
+  notify: restart firewalld
 
 - name: forward ports http
-  shell: firewall-cmd --permanent --add-forward-port=port=80:proto=tcp:toport=80:toaddr=192.168.10.5
+  shell: firewall-cmd --permanent --add-forward-port=port=80:proto=tcp:toport=80:toaddr=192.168.10.5 && touch /tmp/firewalld/http
+  args:
+    creates: /tmp/firewalld/http
+  notify: restart firewalld
 
 - name: forward ports haproxy web
-  shell: firewall-cmd --permanent --add-forward-port=port=10001:proto=tcp:toport=10001:toaddr=192.168.10.5
+  shell: firewall-cmd --permanent --add-forward-port=port=10001:proto=tcp:toport=10001:toaddr=192.168.10.5 && touch /tmp/firewalld/haproxy-web
+  args:
+    creates: /tmp/firewalld/haproxy-web
+  notify: restart firewalld
 
 - name: forward ports haproxy db
-  shell: firewall-cmd --permanent --add-forward-port=port=7000:proto=tcp:toport=7000:toaddr=192.168.10.8
+  shell: firewall-cmd --permanent --add-forward-port=port=7000:proto=tcp:toport=7000:toaddr=192.168.10.8 && touch /tmp/firewalld/haproxy-db
+  args:
+    creates: /tmp/firewalld/haproxy-db
+  notify: restart firewalld
 
 - name: forward ports prometheus
-  shell: firewall-cmd --permanent --add-forward-port=port=9090:proto=tcp:toport=9090:toaddr=192.168.10.5
-
-- name: forward ports prometheus
-  shell: firewall-cmd --permanent --add-forward-port=port=9090:proto=tcp:toport=9090:toaddr=192.168.10.5
+  shell: firewall-cmd --permanent --add-forward-port=port=9090:proto=tcp:toport=9090:toaddr=192.168.10.5 && touch /tmp/firewalld/prometheus
+  args:
+    creates: /tmp/firewalld/prometheus
+  notify: restart firewalld
 
 - name: forward ports grafana
-  shell: firewall-cmd --permanent --add-forward-port=port=3000:proto=tcp:toport=3000:toaddr=192.168.10.5
-  
-- name: restart
-  shell: firewall-cmd --reload 
+  shell: firewall-cmd --permanent --add-forward-port=port=3000:proto=tcp:toport=3000:toaddr=192.168.10.5 && touch /tmp/firewalld/grafana
+  args:
+    creates: /tmp/firewalld/grafana
+  notify: restart firewalld
