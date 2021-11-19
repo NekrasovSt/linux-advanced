@@ -1,3 +1,7 @@
 ---
 - name: restart network
-  shell: nmcli networking off; nmcli networking on
+#  shell: nmcli networking off; nmcli networking on
+  systemd:
+    name: network
+    enabled: yes
+    state: started

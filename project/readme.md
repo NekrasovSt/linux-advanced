@@ -47,6 +47,26 @@ f617da66fb9b90ad: name=db1 peerURLs=http://192.168.10.6:2380 clientURLs=http://1
 +--------+--------------+--------+----------+----+-----------+
 
 ```
+Проверим базу данных
+```
+[root@webserver1 ~]# psql -U admin -h 192.168.10.8 -p 5000 -d Agency
+Password for user admin:
+psql (10.17)
+Type "help" for help.
+
+Agency=> \l
+                                  List of databases
+   Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges
+-----------+----------+----------+-------------+-------------+-----------------------
+ Agency    | admin    | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+ postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+ template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+(4 rows)
+
+```
 ## **Логирование**
 
 Для логирование используется systemd-journal-remote

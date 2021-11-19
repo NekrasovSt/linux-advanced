@@ -1,25 +1,4 @@
-- name: Append a gateway
-  blockinfile:
-    path: /etc/sysconfig/network-scripts/ifcfg-eth1
-    block: |
-      GATEWAY={{ gateway }}
-  notify: restart network
-
-- name: Check if gateway set
-  shell: 'ip r | grep 192.168.10.1'
-  register: cmd_out
-  ignore_errors: True
-
-- name: restart network
-  systemd:
-    name: NetworkManager.service
-    state: restarted
-  when: cmd_out.rc != 0
   
-- name: restart network
-  shell: nmcli networking off; nmcli networking on
-  when: cmd_out.rc != 0
-
 - name: Install packages
   dnf:
     name: '{{ item }}'
@@ -27,11 +6,35 @@
   loop:
     - network-scripts
 
+- name: Disable NetworkManager
+  systemd:
+    name: NetworkManager
+    enabled: no
+    state: stopped
+    
+- name: Remove unused interface
+  file:
+    path: /etc/sysconfig/network-scripts/ifcfg-ens3
+    state: absent
+
+- name: Set zeroconf
+  blockinfile:
+    path: /etc/sysconfig/network
+    block: |
+      NOZEROCONF=yes
+  notify: restart network
+  
+- name: Append a gateway
+  blockinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth1
+    block: |
+      GATEWAY={{ gateway }}
+  notify: restart network
+  
 - name: Disable default route for eth0
   blockinfile:
     path: /etc/sysconfig/network-scripts/ifcfg-eth0
     block: |
       DEFROUTE=no
-      NM_CONTROLLED=yes
   notify: restart network
 

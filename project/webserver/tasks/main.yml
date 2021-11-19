@@ -42,6 +42,7 @@
     image: pitchcontrol/agency-demo:1.0
     state: started
     recreate: no
+    restart: yes
     ports:
       - "8080:80"
     volumes: '/etc/agency/:/app/settings'
