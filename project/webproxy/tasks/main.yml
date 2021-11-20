@@ -16,5 +16,6 @@
   loop:
     - { src: 'haproxy', dest: '/etc/default/' }
     - { src: 'haproxy.cfg', dest: '/etc/haproxy/' }
+    - { src: 'devcert.pem', dest: '/etc/ssl/certs/' }
   notify:
     - restart haproxy

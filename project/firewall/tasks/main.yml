@@ -44,6 +44,12 @@
     creates: /tmp/firewalld/http
   notify: restart firewalld
 
+- name: forward ports https
+  shell: firewall-cmd --permanent --add-forward-port=port=443:proto=tcp:toport=443:toaddr=192.168.10.5 && touch /tmp/firewalld/https
+  args:
+    creates: /tmp/firewalld/https
+  notify: restart firewalld
+  
 - name: forward ports haproxy web
   shell: firewall-cmd --permanent --add-forward-port=port=10001:proto=tcp:toport=10001:toaddr=192.168.10.5 && touch /tmp/firewalld/haproxy-web
   args:
