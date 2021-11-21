@@ -26,11 +26,18 @@
     state: directory
 
 #ansible-galaxy collection install ansible.posix
-- name: config dmz
-  shell: firewall-cmd --permanent --zone=dmz --change-interface=eth1 && touch /tmp/firewalld/dmz
-  args:
-    creates: /tmp/firewalld/dmz
-  notify: restart firewalld
+- name: Set zone dmz
+  blockinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth1
+    block: |
+      ZONE=dmz
+  notify: restart network  
+  
+#- name: config dmz
+#  shell: firewall-cmd --permanent --zone=dmz --change-interface=eth1 && touch /tmp/firewalld/dmz
+#  args:
+#    creates: /tmp/firewalld/dmz
+#  notify: restart firewalld
 
 - name: masquerade
   shell: firewall-cmd --permanent --zone=public --add-masquerade && touch /tmp/firewalld/masquerade

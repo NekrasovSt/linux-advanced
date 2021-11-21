@@ -1,6 +1,6 @@
 ---
 # tasks file for logclient
-- name: Install  systemd-journal-gateway
+- name: Install packages
   dnf:
     name: '{{ item }}'
     state: latest

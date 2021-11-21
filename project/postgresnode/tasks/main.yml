@@ -2,6 +2,7 @@
   dnf:
     name: '{{ item }}'
     state: present
+    disable_gpg_check: yes
   loop:
     - epel-release
     - postgresql-server
