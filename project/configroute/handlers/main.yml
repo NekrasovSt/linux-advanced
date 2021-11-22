@@ -4,4 +4,4 @@
   systemd:
     name: network
     enabled: yes
-    state: started
+    state: restarted

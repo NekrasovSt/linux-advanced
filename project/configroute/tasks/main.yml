@@ -37,14 +37,15 @@
     block: |
       DEFROUTE=no
   notify: restart network
+#
+#- name: Check if gateway set
+#  shell: 'ip r | grep 192.168.10.1 2> /dev/null'
+#  register: cmd_out
+#  ignore_errors: True
 
-- name: Check if gateway set
-  shell: 'ip r | grep 192.168.10.1 2> /dev/null'
-  register: cmd_out
-  ignore_errors: True
-
-- name: restart network
+- name: start network
   systemd:
     name: network
-    state: restarted
-  when: cmd_out.rc != 0
+    state: started
+    enabled: yes
+#  when: cmd_out.rc != 0

@@ -8,6 +8,11 @@
   roles:
     - configroute
 
+- hosts: etcd
+  become: true
+  roles:
+    - etcd
+
 - hosts: dbproxy
   become: True
   roles:

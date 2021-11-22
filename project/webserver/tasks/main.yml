@@ -36,6 +36,16 @@
     state: started
     enabled: yes
 
+- name: Config file for web
+  file:
+    path: "/etc/agency"
+    state: directory
+
+- name: Copy config web
+  copy:
+    src: appsettings.json
+    dest: /etc/agency
+
 - name: Start docker container
   docker_container:
     name: agency
@@ -46,16 +56,6 @@
     ports:
       - "8080:80"
     volumes: '/etc/agency/:/app/settings'
-    
-- name: Config file for web
-  file:
-    path: "/etc/agency"
-    state: directory
-
-- name: Copy config web
-  copy:
-    src: appsettings.json
-    dest: /etc/agency
 
 - name: Selinux policy
 #  shell: setsebool -P httpd_can_network_relay 1

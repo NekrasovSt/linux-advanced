@@ -67,6 +67,22 @@ Agency=> \l
 (4 rows)
 
 ```
+Доступных пользователей
+```
+[root@db1 vagrant]# psql -U admin -h 192.168.10.8 -p 5000 -d Agency
+Password for user admin:
+psql (10.17)
+Type "help" for help.
+
+Agency=> \du
+                                    List of roles
+ Role name  |                         Attributes                         | Member of
+------------+------------------------------------------------------------+-----------
+ admin      | Create role, Create DB                                     | {}
+ postgres   | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+ replicator | Replication                                                | {}
+
+```
 ## **Логирование**
 
 Для логирование используется systemd-journal-remote

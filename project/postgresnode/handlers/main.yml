@@ -3,9 +3,3 @@
     name: patroni
     state: restarted
     enabled: yes
-
-- name: restart etcd
-  systemd:
-    name: etcd
-    state: restarted
-    enabled: yes

@@ -1,0 +1,21 @@
+- name: Install packages
+  dnf:
+    name: '{{ item }}'
+    state: present
+    disable_gpg_check: yes
+  loop:
+    - http://mirror.centos.org/centos/7/extras/x86_64/Packages/etcd-3.3.11-2.el7.centos.x86_64.rpm
+    - libselinux-python3
+    - libsemanage-python3
+
+- name: Copy etcd.conf
+  template:
+    src: etcd.conf.j2
+    dest: /etc/etcd/etcd.conf
+  notify: restart etcd
+
+- name: start etcd
+  systemd:
+    name: etcd
+    state: started
+    enabled: yes
