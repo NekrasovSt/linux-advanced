@@ -117,6 +117,27 @@ Agency=> \du
  replicator | Replication                                                | {}
 
 ```
+### **etcd**
+Список ключей
+```
+[vagrant@db1 ~]$ etcdctl ls / --recursive
+/pg_cluster
+/pg_cluster/postgres
+/pg_cluster/postgres/members
+/pg_cluster/postgres/members/db2
+/pg_cluster/postgres/members/db1
+/pg_cluster/postgres/initialize
+/pg_cluster/postgres/config
+/pg_cluster/postgres/leader
+/pg_cluster/postgres/optime
+/pg_cluster/postgres/optime/leader
+```
+Узнать кто лидер
+```
+[vagrant@db1 ~]$ etcdctl get /pg_cluster/postgres/leader
+db2
+```
+
 ## **Логирование**
 
 Для логирование используется systemd-journal-remote
