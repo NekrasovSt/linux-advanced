@@ -3,6 +3,40 @@
 Итоговый проект для курса "Администратор Linux"
 
 
+
+## **Запуск**
+
+```
+vagrant up
+ansible-playbook install.yml
+```
+## **Firewall**
+
+Настроен проброс портов для машин в DMZ
+
+```
+[root@firewall vagrant]# firewall-cmd --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: eth0 eth2
+  sources:
+  services: cockpit dhcpv6-client ssh
+  ports:
+  protocols:
+  masquerade: yes
+  forward-ports:
+        port=80:proto=tcp:toport=80:toaddr=192.168.10.5
+        port=443:proto=tcp:toport=443:toaddr=192.168.10.5
+        port=10001:proto=tcp:toport=10001:toaddr=192.168.10.5
+        port=7000:proto=tcp:toport=7000:toaddr=192.168.10.8
+        port=9090:proto=tcp:toport=9090:toaddr=192.168.10.5
+        port=3000:proto=tcp:toport=3000:toaddr=192.168.10.5
+  source-ports:
+  icmp-blocks:
+  rich rules:
+```
+
 ## **Web**
 
 Тестовый сайт доступен из хост-машины http://192.168.9.2, настроен редирект на https.

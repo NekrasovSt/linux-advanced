@@ -28,3 +28,9 @@
     src: systemdjournal-remote.service
     dest: /lib/systemd/system/systemd-journal-remote.service
   notify: restart systemd-journal-remote
+
+- name: start systemd-journal-remote
+  systemd:
+    name: systemd-journal-remote
+    state: started
+    enabled: yes  
