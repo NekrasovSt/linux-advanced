@@ -81,6 +81,24 @@ f617da66fb9b90ad: name=db1 peerURLs=http://192.168.10.6:2380 clientURLs=http://1
 +--------+--------------+--------+----------+----+-----------+
 
 ```
+пример switchover
+
+```
+Master [db2]: db2
+Candidate ['db1'] []: db1
+When should the switchover take place (e.g. 2021-11-28T13:52 )  [now]: now
+Current cluster topology
++ Cluster: postgres (7034168596599710655) -+----+-----------+
+| Member |     Host     |  Role  |  State  | TL | Lag in MB |
++--------+--------------+--------+---------+----+-----------+
+|  db1   | 192.168.10.6 |        | running |  6 |         0 |
+|  db2   | 192.168.10.7 | Leader | running |  6 |           |
++--------+--------------+--------+---------+----+-----------+
+Are you sure you want to switchover cluster postgres, demoting current master db2? [y/N]: y
+2021-11-28 12:52:46.47195 Successfully switched over to "db1"
+
+```
+
 Проверим базу данных
 ```
 [root@webserver1 ~]# psql -U admin -h 192.168.10.8 -p 5000 -d Agency
@@ -117,6 +135,75 @@ Agency=> \du
  replicator | Replication                                                | {}
 
 ```
+### **backup & restore**
+Попробуем выполнить восстановление из бэкапа в ручном режиме
+На слэйв ноде сделаем резервную копию
+```
+[root@db1 vagrant]# mkdir -p /var/backup
+[root@db1 vagrant]# pg_basebackup --pgdata=/var/backup --format=tar --gzip --compress=9 --label=base_backup  --username=replicator --progress --verbose
+[root@db1 vagrant]# ll /var/backup/
+total 3544
+-rw-r--r--. 1 root root 3606002 Nov 28 14:15 base.tar.gz
+-rw-------. 1 root root   18864 Nov 28 14:15 pg_wal.tar.gz
+```
+
+Дропнем базу
+```
+psql -U admin -h 192.168.10.8 -p 5000 -d postgres
+postgres=> drop database "Agency";
+DROP DATABASE
+postgres=> \l
+                                  List of databases
+   Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges
+-----------+----------+----------+-------------+-------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+ template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+(3 rows)
+
+postgres=>
+```
+Останавливаем patroni на обоих нодах
+```
+[root@db1 vagrant]# systemctl stop patroni
+```
+Удалим файлы баз данных на обоих нодах
+
+```
+[root@db1 vagrant]# rm -rf /var/lib/pgsql/data/*
+```
+Удаляем кластер
+```
+[root@db1 vagrant]# patronictl -c /opt/app/patroni/etc/postgresql.yml remove postgres
++ Cluster: postgres (7034168596599710655) ------+
+| Member | Host | Role | State | TL | Lag in MB |
++--------+------+------+-------+----+-----------+
++--------+------+------+-------+----+-----------+
+Please confirm the cluster name to remove: postgres
+You are about to remove all information in DCS for postgres, please type: "Yes I am aware": Yes I am aware
+```
+Копируем файлы бэкапа
+```
+[root@db1 vagrant]# tar xzfp /var/backup/base.tar.gz -C /var/lib/pgsql/data/
+[root@db1 vagrant]# tar xzfp /var/backup/pg_wal.tar.gz -C /var/lib/pgsql/data/pg_wal/
+```
+Стартуем на обоих нодах
+```
+[root@db1 vagrant]# systemctl start patroni
+
+[root@db2 vagrant]# systemctl start patroni
+[root@db1 vagrant]# patronictl -c /opt/app/patroni/etc/postgresql.yml list
++ Cluster: postgres (7034168596599710655) -+----+-----------+
+| Member |     Host     |  Role  |  State  | TL | Lag in MB |
++--------+--------------+--------+---------+----+-----------+
+|  db1   | 192.168.10.6 | Leader | running | 10 |           |
+|  db2   | 192.168.10.7 |        | running | 10 |         0 |
++--------+--------------+--------+---------+----+-----------+
+```
+Данные восcтановлены!
+
 ### **etcd**
 Список ключей
 ```
